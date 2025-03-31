@@ -1,0 +1,40 @@
+// Create a tetrahedron model with Three.js
+import * as THREE from 'three';
+import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js';
+
+// Create a scene
+const scene = new THREE.Scene();
+
+// Create a tetrahedron geometry
+const radius = 1;
+const tetraGeometry = new THREE.TetrahedronGeometry(radius);
+
+// Create a material
+const material = new THREE.MeshStandardMaterial({
+    color: 0x00ff00,
+    metalness: 0.5,
+    roughness: 0.5
+});
+
+// Create a mesh with the geometry and material
+const tetrahedron = new THREE.Mesh(tetraGeometry, material);
+scene.add(tetrahedron);
+
+// Set up the exporter
+const exporter = new GLTFExporter();
+
+// Export the scene as GLB
+exporter.parse(
+    scene,
+    function (result) {
+        // Save the binary data to a file
+        if (result instanceof ArrayBuffer) {
+            const blob = new Blob([result], { type: 'application/octet-stream' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'tetrahedron.glb';
+            link.click();
+        }
+    },
+    { binary: true } // Export as binary GLB
+);

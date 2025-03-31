@@ -67,36 +67,14 @@ export default [
     },
     rules: {
       'eslint-comments/no-unused-disable': 'error',
-      'no-console': [
-        'warn',
-        {
-          allow: ['warn', 'error'],
-        },
-      ],
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
       'no-use-before-define': 'off',
       'no-warning-comments': 'off',
-      'object-shorthand': [
-        'error',
-        'always',
-        {
-          avoidQuotes: true,
-        },
-      ],
+      'object-shorthand': ['error', 'always', { avoidQuotes: true }],
       'no-useless-escape': 'off',
       'no-case-declarations': 'off',
     },
   },
-  ...fixupConfigRules(
-    compat.extends(
-      'plugin:react/recommended',
-      'plugin:react/jsx-runtime',
-      'plugin:react-hooks/recommended',
-      'plugin:jsx-a11y/recommended',
-    ),
-  ).map((config) => ({
-    ...config,
-    files: ['**/*.{js,jsx,ts,tsx}'],
-  })),
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
     plugins: {
@@ -109,26 +87,48 @@ export default [
       },
       formComponents: ['Form'],
       linkComponents: [
-        {
-          name: 'Link',
-          linkAttribute: 'to',
-        },
-        {
-          name: 'NavLink',
-          linkAttribute: 'to',
-        },
+        { name: 'Link', linkAttribute: 'to' },
+        { name: 'NavLink', linkAttribute: 'to' },
       ],
       'import/resolver': {
         typescript: {},
       },
     },
     rules: {
-      'jsx-a11y/control-has-associated-label': 'off',
-      'jsx-a11y/label-has-for': 'off',
       'react/display-name': 'off',
-      'react/no-array-index-key': 'warn',
       'react/prop-types': 'off',
       'react/react-in-jsx-scope': 'off',
+      'react/no-array-index-key': 'warn',
+      'jsx-a11y/control-has-associated-label': 'off',
+      'jsx-a11y/label-has-for': 'off',
+      'react/no-unknown-property': [
+        'error',
+        {
+          ignore: [
+            'object',
+            'position',
+            'rotation',
+            'scale',
+            'args',
+            'intensity',
+            'font',
+            'bevelEnabled',
+            'bevelThickness',
+            'bevelSize',
+            'bevelSegments',
+            'curveSegments',
+            'height',
+            'size',
+            'visible',
+            'color',
+            'emissive',
+            'emissiveIntensity',
+            'side',
+            'toneMapped',
+            'attach',
+          ],
+        },
+      ],
     },
   },
   ...fixupConfigRules(
@@ -150,9 +150,6 @@ export default [
     languageOptions: {
       parser: tsParser,
       parserOptions: {
-        projectService: {
-          allowDefaultProject: ['.graphqlrc.ts'],
-        },
         tsconfigRootDir: __dirname,
         ecmaFeatures: {
           jsx: true,
@@ -162,27 +159,22 @@ export default [
     settings: {
       'import/internal-regex': '^~/',
       'import/resolvers': {
-        node: {
-          extensions: ['.ts', '.tsx'],
-        },
-        typescript: {
-          alwaysTryTypes: true,
-          project: __dirname,
-        },
+        node: { extensions: ['.ts', '.tsx'] },
+        typescript: { alwaysTryTypes: true, project: __dirname },
       },
     },
     rules: {
       '@typescript-eslint/ban-ts-comment': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/naming-convention': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'off',
+      '@typescript-eslint/no-empty-function': 'off',
+      '@typescript-eslint/no-empty-interface': 'off',
+      '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/no-non-null-asserted-optional-chain': 'off',
-    },
-  },
-  {
-    files: ['**/.eslintrc.cjs'],
-    languageOptions: {
-      globals: {
-        ...globals.node,
-      },
+      '@typescript-eslint/explicit-module-boundary-types': 'off',
+      'react/prop-types': 'off',
     },
   },
   ...compat.extends('plugin:jest/recommended').map((config) => ({
@@ -191,9 +183,7 @@ export default [
   })),
   {
     files: ['**/*.test.*'],
-    plugins: {
-      jest,
-    },
+    plugins: { jest },
     languageOptions: {
       globals: {
         ...globals.node,
@@ -205,57 +195,6 @@ export default [
     files: ['**/*.server.*'],
     rules: {
       'react-hooks/rules-of-hooks': 'off',
-    },
-  },
-  ...fixupConfigRules(
-    compat.extends(
-      'plugin:@typescript-eslint/eslint-recommended',
-      'plugin:@typescript-eslint/recommended',
-    ),
-  ).map((config) => ({
-    ...config,
-    files: ['**/*.ts', '**/*.tsx'],
-  })),
-  {
-    files: ['**/*.ts', '**/*.tsx'],
-    languageOptions: {
-      parser: tsParser,
-    },
-    rules: {
-      '@typescript-eslint/explicit-module-boundary-types': 'off',
-      '@typescript-eslint/naming-convention': [
-        'error',
-        {
-          selector: 'default',
-          format: ['camelCase', 'PascalCase', 'UPPER_CASE'],
-          leadingUnderscore: 'allowSingleOrDouble',
-          trailingUnderscore: 'allowSingleOrDouble',
-        },
-        {
-          selector: 'typeLike',
-          format: ['PascalCase'],
-        },
-        {
-          selector: 'typeParameter',
-          format: ['PascalCase'],
-          leadingUnderscore: 'allow',
-        },
-        {
-          selector: 'interface',
-          format: ['PascalCase'],
-        },
-        {
-          selector: 'property',
-          format: null,
-        },
-      ],
-      '@typescript-eslint/no-empty-function': 'off',
-      '@typescript-eslint/no-empty-interface': 'off',
-      '@typescript-eslint/no-empty-object-type': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-non-null-assertion': 'off',
-      '@typescript-eslint/no-unused-vars': 'off',
-      'react/prop-types': 'off',
     },
   },
 ];
