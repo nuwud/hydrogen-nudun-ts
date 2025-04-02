@@ -124,11 +124,81 @@ Patrick Allan Wood – `Nuwud Multimedia`
 
 ```
 
+# 🍉 WatermelonMenu3D Integration Guide
+
+This document outlines the setup, purpose, and developer usage patterns for the 3D interactive main menu system integrated into Hydrogen.
+
+## 🚀 Purpose
+WatermelonMenu3D is a 3D orbiting menu system designed to:
+- Act as a main site navigation UI in 3D space
+- Be visually captivating and reactive
+- Connect seamlessly to Hydrogen/Shopify routes
+- Serve as a modular and extensible layout base
+
+## 🧱 Tech Stack
+- [@react-three/fiber](https://github.com/pmndrs/react-three-fiber)
+- [@react-three/drei](https://github.com/pmndrs/drei)
+- Remix / Hydrogen 2025
+- TypeScript + ESLint + Vite
+
+## 🧩 Components
+- `WatermelonMenu3D.tsx`: Main Canvas entrypoint
+- `Menu()`: Carousel group with orbiting clickable `Text3D`
+- `TetrahedronButton.tsx`: dat.GUI toggle launcher (bottom-right)
+- `Layout3DWrapper.tsx`: Encapsulates 3D layer and passes children
+
+## 📦 Setup Instructions
+
+1. Ensure the following font is present:
+```
+public/assets/font.typeface.json
+```
+2. Update Hydrogen root in `App.server.tsx`:
+```tsx
+<Layout3DWrapper>
+  <Suspense fallback={<div>Loading site...</div>}>
+    <RouterProvider router={router} />
+  </Suspense>
+</Layout3DWrapper>
+```
+3. Menu Items:
+```ts
+// config/WatermelonMenuConfig.ts
+export const menuItems = [
+  { label: 'Home', route: '/' },
+  { label: 'Shop', route: '/collections' },
+  { label: 'Contact', route: '/pages/contact' },
+];
+```
+
+## ✨ Features
+- Animated rotation using `useFrame`
+- Clickable `Text3D` using `navigate()` from Remix
+- Suspense and lazy loading support
+- OrbitControls with pan disabled
+
+## 🔄 Future Tasks
+- Add spring-based hover/click animation
+- Inject Shopify metafield data dynamically
+- Add submenu vertical wheel logic
+- Toggle UI elements with dat.GUI / Tetrahedron
+
+## 🧠 Developer Notes
+- ESLint `react/no-unknown-property` must be overridden for props like `rotation`, `font`, `args`, etc.
+- FontLoader must be handled via `useLoader(FontLoader, 'path')` to get a `FontData`, not `Font`
+- Don't use raw `Font` types from `three`
+- Canvas must remain SSR-safe via `Suspense` and `lazy` boundaries
+
+## 🗂️ Optional: Docs Locations
+- `docs/ABOUT.md` (Project story)
+- `docs/WATERMELON.md` (Technical guide)
+- `CHANGELOG.md` (Semver-style log)
+- `.github/ISSUE_TEMPLATE/` (Feature / bug tracking)
+
 ---
 
-Would you like me to:
-- Inject this as a file in your project?
-- Make a lighter version to keep in the `docs/` folder?
-- Create an `ABOUT.md` or `WATERMELON.md` for the component itself?
+> Built with joy, creativity, and one juicy commit at a time 🍉
 
-Also ready to help scaffold your changelog, issue template, or shopify.metafield schema next. Let’s keep it flowing, one clean commit at a time 🍉💻
+— Team Nuwud x Trügüd
+
+
