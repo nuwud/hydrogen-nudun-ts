@@ -1,49 +1,33 @@
-import {useNonce, Analytics} from '@shopify/hydrogen';
-import {
-  Links,
-  Meta,
-  Scripts,
-  useRouteLoaderData,
-  ScrollRestoration,
-  Outlet,
-} from '@remix-run/react';
+// app/layout.tsx
+import { Links, Meta, Scripts, ScrollRestoration } from '@remix-run/react';
+import { useNonce } from '@shopify/hydrogen';
+import tailwindCss from './styles/tailwind.css?url';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
-import tailwindCss from './styles/tailwind.css?url';
-import {PageLayout} from '~/components/PageLayout';
-import {RootLoader} from './root';
+import { ClientOnly } from '~/components/ClientOnly';
+import Layout3DWrapper from '~/components/Layout3DWrapper';
 
 export default function Layout() {
   const nonce = useNonce();
-  const data = useRouteLoaderData<RootLoader>('root');
 
   return (
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <link rel="stylesheet" href={tailwindCss}></link>
-        <link rel="stylesheet" href={resetStyles}></link>
-        <link rel="stylesheet" href={appStyles}></link>
+        <link rel="stylesheet" href={tailwindCss} />
+        <link rel="stylesheet" href={resetStyles} />
+        <link rel="stylesheet" href={appStyles} />
         <Meta />
         <Links />
       </head>
       <body>
-        {data ? (
-          <Analytics.Provider
-            cart={data.cart}
-            shop={data.shop}
-            consent={data.consent}
-          >
-            <PageLayout {...data}>
-              <Outlet />
-            </PageLayout>
-          </Analytics.Provider>
-        ) : (
-          <Outlet />
-        )}
-        <ScrollRestoration nonce={nonce} />
-        <Scripts nonce={nonce} />
+        <ClientOnly>
+          <Layout3DWrapper>
+            <ScrollRestoration nonce={nonce} />
+            <Scripts nonce={nonce} />
+          </Layout3DWrapper>
+        </ClientOnly>
       </body>
     </html>
   );

@@ -5,8 +5,6 @@
  */
 // app/routes/_index.tsx
 
-import WatermelonClientWrapper from '~/components/WatermelonMenu3D.client';
-
 export default function Index() {
-  return <WatermelonClientWrapper />;
+  return null; // WatermelonCanvas handles everything
 }
