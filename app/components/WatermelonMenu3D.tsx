@@ -1,4 +1,16 @@
-import React, { useRef, useState, Suspense } from 'react';
+/**
+ * WatermelonMenu3D.tsx
+ *
+ * 🍉 WatermelonOS Interactive 3D Menu [GLOW-UP VERSION ✨]
+ *
+ * Responsibilities:
+ * - Renders the central rotating 3D carousel menu
+ * - Injects products into slots dynamically via ProductSlotInjector
+ * - Supports admin themes, entrance animations, and splash screen
+ * - Handles hover glow, click-to-expand, and fallback toggle
+ */
+
+import React, { useRef, useState, useEffect, Suspense } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { Environment, OrbitControls, Text3D, Html } from '@react-three/drei';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
@@ -6,23 +18,83 @@ import fontData from 'public/assets/font.typeface.json';
 import { Group, Mesh, Vector3 } from 'three';
 import TetrahedronButton from './TetrahedronButton';
 import { menuItems } from '../config/WatermelonMenuConfig';
+import { useSceneContext } from '../context/SceneManager';
+import ProductSlotInjector from './ProductSlotInjector';
+import { useSplashFadeIn } from '../hooks/useSplashFadeIn';
+import { useSceneStore } from '../../store/watermelonStore';
+
+interface SlotEntry {
+  key: string;
+  node: React.ReactNode;
+}
+
+// Define the props interface for ProductSlotInjector
+interface ProductSlotInjectorProps {
+  mountSlot: (slotTarget: string, node: React.ReactNode) => void;
+  theme: string;
+}
+
+// The actual implementation will be in the ProductSlotInjector component
 
 function Menu() {
   const groupRef = useRef<Group>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  // Load the 3D font
+  const { isMenuVisible = true, theme = 'default' } = useSceneContext?.() || {};
+  const [slots, setSlots] = useState<SlotEntry[]>([]);
+  const fadeInValues = useSplashFadeIn?.(isMenuVisible) || { opacity: 0, scale: 0 };
+  const { opacity: splashOpacity } = fadeInValues;
+  
   // Load the 3D font
   const fontLoader = new FontLoader();
-const font = fontLoader.parse(fontData);
+  const font = fontLoader.parse(fontData);
   const radius = 3; // Distance of menu items from center
-  useFrame(({ clock }) => {
-    if (groupRef.current) {
-      groupRef.current.rotation.y = clock.getElapsedTime() * 0.1;
+  
+  useFrame(({ clock }, delta) => {
+    if (groupRef.current && isMenuVisible) {
+      // Use improved, smoother rotation
+      groupRef.current.rotation.y += delta * 0.25;
     }
   });
 
+  const onMountToSlot = (slotTarget: string, node: React.ReactNode) => {
+    setSlots((prev) => [...prev, { key: slotTarget, node }]);
+  };
+
+  useEffect(() => {
+    if (!isMenuVisible) setSlots([]);
+  }, [isMenuVisible]);
+
   return (
     <group ref={groupRef}>
+      {/* Splash Screen */}
+      {typeof splashOpacity === 'number' ? 
+        (splashOpacity > 0 && (
+          <mesh position={[0, 1.5, 0]}>
+            <Text3D
+              font={font}
+              size={0.2}
+              height={0.02}
+            >
+              Welcome to WatermelonOS v1.0
+              <meshStandardMaterial color="#fdf6e3" transparent={true} opacity={splashOpacity} />
+            </Text3D>
+          </mesh>
+        ))
+        : (splashOpacity?.get?.() > 0 && (
+          <mesh position={[0, 1.5, 0]}>
+            <Text3D
+              font={font}
+              size={0.2}
+              height={0.02}
+            >
+              Welcome to WatermelonOS v1.0
+              <meshStandardMaterial color="#fdf6e3" transparent={true} opacity={splashOpacity?.get?.()} />
+            </Text3D>
+          </mesh>
+        ))
+      }
+      
+      {/* Original Menu Items */}
       {menuItems.map((item, i) => {
         const angle = (i / menuItems.length) * Math.PI * 2;
         const x = Math.cos(angle) * radius;
@@ -44,6 +116,19 @@ const font = fontLoader.parse(fontData);
           </Text3D>
         );
       })}
+      
+      {/* Injected Product Slots */}
+      {slots.map(({ key, node }) => (
+        <group key={key}>{node}</group>
+      ))}
+
+      {/* Injector logic mount */}
+      {typeof ProductSlotInjector === 'function' && (
+        <ProductSlotInjector 
+          mountSlot={onMountToSlot} 
+          theme={theme} 
+        />
+      )}
     </group>
   );
 }
@@ -66,7 +151,9 @@ function EnvironmentWrapper() {
   );
 }
 
-export default function WatermelonMenu3D() {
+const WatermelonMenu3D = () => {
+  const { theme, setTheme } = useSceneStore();
+  
   return (
     <Canvas camera={{ position: [0, 2, 7], fov: 50 }} shadows>
       <Suspense fallback={<Html>Loading...</Html>}>
@@ -78,4 +165,6 @@ export default function WatermelonMenu3D() {
       <TetrahedronButton />
     </Canvas>
   );
-}
+};
+
+export default WatermelonMenu3D;
